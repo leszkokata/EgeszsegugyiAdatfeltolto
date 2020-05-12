@@ -108,7 +108,7 @@ router.route('/doctor/:patient').get((req, res) => {
             // Paciens neve, amiszerint kiolvassuk a mereseket es kilistazzuk
             var patient = req.params.patient;
 
-            patientModel.find({ name: patient }, function(err, measurements) {
+            measurementModel.find({ patient: patient }, function(err, measurements) {
                 if(err) return res.json( { success: false, message: 'Hiba a meresek listazasa folyaman!' + err } );
                 return res.json( { success: true, message: measurements } );
             });
@@ -129,7 +129,7 @@ router.route('/patient/measurementsList').get((req, res) => {
     } else { return res.json( { success: false, message: 'Ehhez be kell jelentkeznie!' } ); }
 });
 
-// Beteg mereseinek listázása (csak beteg szamara)
+// Beteg meresenek hozzaadasa
 router.route('/patient/addMeasurement').post((req, res) => {
     if(req.isAuthenticated()) {
         // Ha beteg
@@ -153,6 +153,9 @@ router.route('/patient/addMeasurement').post((req, res) => {
                         doctorModel.findOne({ name: req.user.doctor }, function(err, doctor){
                             if(err) return done('Hiba az orvos keresése során!', undefined)
                             if(doctor) {
+
+                                return res.json({ success: true, message:'Sikeres hozzadas'});
+                                /*
                                 // Email kuldese
                                 const transporter = nodemailer.createTransport({
                                     service: 'gmail',
@@ -175,9 +178,12 @@ router.route('/patient/addMeasurement').post((req, res) => {
                                         return res.json( { success: true, message: 'Sikeres mentes!' } );
                                         console.log('Email elküldve: ' + info.response); }
                                 });
-                            } else { return done("Hibás vagy nem létező orvos felhasználónév!", undefined); }
+                                */
+                            } else  { return res.json( { success: false, message: 'Hibás vagy nem létező felhasználónév!' } ); }
                         });
+                        
                     }
+                    
                 });
                 
             } else { return res.json( { success: false, message: 'Sikertelen mentes! Valamely adat hiányzik!' } ); }

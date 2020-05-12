@@ -21,15 +21,18 @@ const doctorModel = mongoose.model('doctor');
 const measurementModel = mongoose.model('measurement');
 
 
-var whitelist = ['http://localhost:4200/','http://localhost:4200/login', 'http://localhost:4200/patient','http://localhost:4200/doctor'];
+var whitelist = ['chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop','http://localhost','http://localhost:4200','http://localhost:4200/login', 'http://localhost:4200/patient','http://localhost:4200/doctor'];
 var corsOptions = {
     origin: function (origin, callback) {
+        
       if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
+        
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
+    optionsSuccessStatus: 200,
     credentials: true
 };
 
@@ -40,20 +43,6 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.connection.on('error', () => { console.log("Hiba a kapcsolódás folyamán!"); })
 
-//app.use(cors());
-app.use(cors(corsOptions));
-
-/*
-app.get('/', function(req,res,next) {
-    res.json({msg: 'This is CORS-enabled for all origins!'})
-})
-app.get('/login', function(req,res,next) {
-    res.json({msg: 'This is CORS-enabled for all origins!'})
-})
-app.get('/patient', function(req,res,next) {
-    res.json({msg: 'This is CORS-enabled for all origins!'})
-})
-*/
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -108,8 +97,9 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/', require('./routes'));
-
+//app.use('/', require('./routes'));
+//app.use(cors(corsOptions));
+app.use('/', cors(corsOptions), require('./routes'));
 
 // Szerver inditasa
 app.listen(port, () => { console.log('Fut a szerver a ' + port + ' porton!'); });
